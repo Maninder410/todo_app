@@ -15,9 +15,17 @@ config({
 // Using Middlewares
 app.use(express.json());
 app.use(cookieParser());
+const allowedOrigins = [process.env.FRONTEND_URL, 'http://localhost:5173']; // Add your frontend URL and localhost to the allowed origins.
+
 app.use(
   cors({
-    origin: [process.env.FRONTEND_URL],
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
